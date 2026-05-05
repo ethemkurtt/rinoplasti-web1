@@ -244,24 +244,29 @@ header.site-header {
 }
 
 .hero__cta {
-    display: inline-flex;
+    display: flex;
     align-self: flex-start;
-    align-items: center;
+    width: 372px;
+    height: 48px;
+    padding: 12px 20px;
     justify-content: center;
-    padding: 18px 48px;
-    border-radius: 999px;
-    background: #F58462;
+    align-items: center;
+    gap: 8px;
+    border-radius: 12px;
+    background: #F98755;
     color: #FFF;
-    font-size: 17px;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 16px;
     font-weight: 600;
     text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-sizing: border-box;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hero__cta:hover {
-    background: #E76E4A;
+    background: #E8743F;
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(245, 132, 98, 0.35);
+    box-shadow: 0 10px 24px rgba(249, 135, 85, 0.35);
 }
 
 .hero__rating {
