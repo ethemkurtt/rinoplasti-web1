@@ -134,10 +134,16 @@
         let lockedScrollY = 0;
         let lastUnlock = 0;
 
+        const dots = section.querySelectorAll('.steps__dot');
+
         function update() {
             slides.forEach(function (s, i) {
                 s.classList.toggle('is-active', i === currentSlide);
                 s.classList.toggle('is-past', i < currentSlide);
+            });
+            dots.forEach(function (d, i) {
+                d.classList.toggle('is-active', i <= currentSlide);
+                d.classList.toggle('is-current', i === currentSlide);
             });
             if (lineFill) {
                 const pct = total > 1 ? (currentSlide / (total - 1)) * 100 : 100;

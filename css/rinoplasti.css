@@ -421,37 +421,16 @@ header.site-header {
 .steps__progress {
     flex: 0 0 100px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
     padding: 80px 0;
-    gap: 16px;
-}
-
-.steps__dot {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid #003366;
-    background: #FFF;
-    position: relative;
-    flex-shrink: 0;
-}
-
-.steps__dot::before {
-    content: "";
-    position: absolute;
-    inset: 6px;
-    border-radius: 50%;
-    background: #003366;
 }
 
 .steps__line {
-    flex: 1;
-    width: 2px;
-    background: #E5E5E5;
-    border-radius: 2px;
-    overflow: hidden;
     position: relative;
+    width: 4px;
+    height: 100%;
+    background: #E5E5E5;
+    border-radius: 4px;
 }
 
 .steps__line-fill {
@@ -460,9 +439,52 @@ header.site-header {
     left: 0;
     width: 100%;
     height: 0%;
-    background: #003366;
-    transition: height 0.2s ease;
+    background: linear-gradient(180deg, #2B4578 0%, #B7D3F3 100%);
+    border-radius: 4px;
+    transition: height 0.9s cubic-bezier(0.65, 0, 0.35, 1);
 }
+
+.steps__dot {
+    position: absolute;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #FFF;
+    border: 2px solid #E5E5E5;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    transition: border-color 0.4s ease, transform 0.4s ease;
+}
+
+.steps__dot::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 0.4s ease;
+}
+
+.steps__dot.is-active {
+    border-color: #2B4578;
+}
+
+.steps__dot.is-active::after {
+    background: #2B4578;
+}
+
+.steps__dot.is-current {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 0 4px rgba(43, 69, 120, 0.15);
+}
+
+.steps__dot[data-i="0"] { top: 0%; }
+.steps__dot[data-i="1"] { top: 20%; }
+.steps__dot[data-i="2"] { top: 40%; }
+.steps__dot[data-i="3"] { top: 60%; }
+.steps__dot[data-i="4"] { top: 80%; }
+.steps__dot[data-i="5"] { top: 100%; }
 
 .steps__viewport {
     flex: 1;
