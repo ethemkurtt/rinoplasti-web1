@@ -143,9 +143,12 @@
     }
 })();
 
-// Steps: hard scroll-lock — section'a girer girmez body fixed olur,
-// hiçbir scroll input'u (wheel/scrollbar/momentum/touch) sayfayı hareket ettiremez.
-// Slide'lar sırayla, cooldown ile geçer. Bittiğinde lock kalkar, normal scroll devam eder.
+// Steps: hard scroll-lock + burst detection
+// - Section view'a girer girmez html+body overflow:hidden (sayfa fiziksel olarak donar)
+// - Bir input burst'i (250ms event-free aralık) = 1 aksiyon (1 advance VEYA 1 exit)
+//   Momentum scroll boyunca event'ler sadece burst'ü uzatır, ek advance YOK
+// - Exit sonrası 600ms re-lock yasağı + 10px overshoot → re-lock döngüsü kırılır
+// - Touch: per-session flag (touchstart→touchend arası 1 advance)
 (function () {
     function initSteps() {
         const section = document.getElementById('stepsSection');
@@ -156,13 +159,17 @@
         const total = slides.length;
         if (!total) return;
 
-        const COOLDOWN = 700;
-        const TOUCH_THRESHOLD = 30;
+        const BURST_END_DELAY = 250;   // event-free süre — burst bittikten sonra yeni aksiyon mümkün
+        const EXIT_COOLDOWN   = 600;   // exit sonrası re-lock yasağı (ms)
+        const EXIT_OVERSHOOT  = 10;    // exit'te section dışına scroll buffer'ı (px)
+        const TOUCH_THRESHOLD = 30;    // touch advance için min hareket (px)
 
         let currentSlide = 0;
-        let lastTransition = 0;
         let isLocked = false;
         let lockedScrollY = 0;
+        let exitTime = 0;
+        let burstActive = false;
+        let burstTimer = null;
 
         function render() {
             slides.forEach(function (s, i) {
@@ -179,15 +186,22 @@
             }
         }
 
-        // Body'i scroll yapamaz hale getir. scrollY korunur (sıçrama yok).
+        // ----- BURST -----
+        function bumpBurst() {
+            if (burstTimer) clearTimeout(burstTimer);
+            burstTimer = setTimeout(function () {
+                burstActive = false;
+                burstTimer = null;
+            }, BURST_END_DELAY);
+        }
+
+        // ----- LOCK -----
         function lockBody() {
             if (isLocked) return;
             isLocked = true;
             lockedScrollY = window.scrollY;
 
             const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-
-            // overflow: hidden — scroll fiziksel olarak durur, position değişmez
             document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
             if (scrollbarWidth > 0) {
@@ -195,7 +209,6 @@
             }
         }
 
-        // Body'i serbest bırak, hedeflenen pozisyona scroll et.
         function unlockBody(targetScrollY) {
             if (!isLocked) return;
             isLocked = false;
@@ -209,50 +222,50 @@
             }
         }
 
-        function tryAdvance(direction) {
-            const now = Date.now();
-            if (now - lastTransition < COOLDOWN) return false;
-
+        function advance(direction) {
             if (direction > 0 && currentSlide < total - 1) {
                 currentSlide++;
-                lastTransition = now;
                 render();
-                return true;
             } else if (direction < 0 && currentSlide > 0) {
                 currentSlide--;
-                lastTransition = now;
                 render();
-                return true;
             }
-            return false;
         }
 
-        // Section viewport top'a değdi mi? Değdiyse hizala + lock.
+        function exitDown() {
+            exitTime = Date.now();
+            unlockBody(lockedScrollY + section.offsetHeight + EXIT_OVERSHOOT);
+        }
+
+        function exitUp() {
+            exitTime = Date.now();
+            unlockBody(lockedScrollY - EXIT_OVERSHOOT);
+        }
+
         function checkAndLock() {
             if (isLocked) return;
-            const rect = section.getBoundingClientRect();
-            if (rect.top > 0 || rect.bottom <= 0) return; // section view dışı
+            if (Date.now() - exitTime < EXIT_COOLDOWN) return;
 
-            // Section üstünü viewport top'a snap — kullanıcı hızlı geçtiyse geri çek
-            if (rect.top < 0) {
-                window.scrollBy(0, rect.top);
-            }
+            const rect = section.getBoundingClientRect();
+            if (rect.top > 0 || rect.bottom <= 0) return;
+
+            if (rect.top < 0) window.scrollBy(0, rect.top);
             lockBody();
         }
 
-        // Section'dan aşağı çıkış: lock'u kaldır, section altına scroll
-        function exitDown() {
-            unlockBody(lockedScrollY + section.offsetHeight);
-        }
+        // Wheel/Key tek aksiyon helper'ı: bir burst içinde 1 kez advance/exit
+        function processInput(direction) {
+            if (burstActive) { bumpBurst(); return; }
+            burstActive = true;
+            bumpBurst();
 
-        // Section'dan yukarı çıkış: lock'u kaldır, section üstüne scroll
-        function exitUp() {
-            unlockBody(lockedScrollY - 1);
+            if (direction > 0 && currentSlide >= total - 1) { exitDown(); return; }
+            if (direction < 0 && currentSlide <= 0) { exitUp(); return; }
+            advance(direction);
         }
 
         // ===== WHEEL =====
         function handleWheel(e) {
-            // Lock değilsek önce kontrol et — bu wheel section'a gelişi tetiklemiş olabilir
             if (!isLocked) checkAndLock();
             if (!isLocked) return;
 
@@ -260,50 +273,38 @@
             const deltaY = e.deltaY;
             if (deltaY === 0) return;
 
-            // Son slide & aşağı → çıkış
-            if (deltaY > 0 && currentSlide >= total - 1) {
-                exitDown();
-                return;
-            }
-            // İlk slide & yukarı → çıkış
-            if (deltaY < 0 && currentSlide <= 0) {
-                exitUp();
-                return;
-            }
-
-            tryAdvance(deltaY > 0 ? 1 : -1);
+            processInput(deltaY > 0 ? 1 : -1);
         }
 
-        // ===== TOUCH =====
+        // ===== TOUCH (per-session 1 advance) =====
         let touchStartY = 0;
+        let touchHandled = false;
 
         function handleTouchStart(e) {
             touchStartY = e.touches[0].clientY;
+            touchHandled = false;
+        }
+
+        function handleTouchEnd() {
+            touchHandled = false;
         }
 
         function handleTouchMove(e) {
             if (!isLocked) checkAndLock();
             if (!isLocked) return;
 
-            const touchY = e.touches[0].clientY;
-            const totalDelta = touchStartY - touchY;
-
-            if (totalDelta > 0 && currentSlide >= total - 1) {
-                exitDown();
-                return;
-            }
-            if (totalDelta < 0 && currentSlide <= 0) {
-                exitUp();
-                return;
-            }
-
             e.preventDefault();
+            if (touchHandled) return;
 
-            if (Math.abs(totalDelta) >= TOUCH_THRESHOLD) {
-                if (tryAdvance(totalDelta > 0 ? 1 : -1)) {
-                    touchStartY = touchY;
-                }
-            }
+            const totalDelta = touchStartY - e.touches[0].clientY;
+            if (Math.abs(totalDelta) < TOUCH_THRESHOLD) return;
+
+            touchHandled = true;
+            const direction = totalDelta > 0 ? 1 : -1;
+
+            if (direction > 0 && currentSlide >= total - 1) { exitDown(); return; }
+            if (direction < 0 && currentSlide <= 0) { exitUp(); return; }
+            advance(direction);
         }
 
         // ===== KEYBOARD =====
@@ -318,14 +319,10 @@
             if (!isDown && !isUp) return;
 
             e.preventDefault();
-
-            if (isDown && currentSlide >= total - 1) { exitDown(); return; }
-            if (isUp && currentSlide <= 0) { exitUp(); return; }
-
-            tryAdvance(isDown ? 1 : -1);
+            processInput(isDown ? 1 : -1);
         }
 
-        // rAF safety net — section'a hızlı geçişte yakala, lock'ta kayma olursa düzelt
+        // rAF: lock'ta kayma olursa düzelt + dışarıdayken section'a girişi yakala
         function rafLoop() {
             if (isLocked) {
                 if (Math.abs(window.scrollY - lockedScrollY) > 0.5) {
@@ -341,6 +338,8 @@
         window.addEventListener('wheel', handleWheel, { passive: false });
         window.addEventListener('touchstart', handleTouchStart, { passive: true });
         window.addEventListener('touchmove', handleTouchMove, { passive: false });
+        window.addEventListener('touchend', handleTouchEnd, { passive: true });
+        window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
         window.addEventListener('keydown', handleKey);
 
         requestAnimationFrame(rafLoop);
