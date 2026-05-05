@@ -1573,7 +1573,7 @@ header.site-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-    padding: 20px 28px;
+    padding: 20px;
     border-radius: 12px;
     border: 1px solid #0059B3;
     background: #FFF;
@@ -1642,10 +1642,11 @@ header.site-header {
 .review__source {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin-top: auto;
     padding-top: 12px;
     width: 100%;
+    justify-content: flex-start;
 }
 
 .review__source > svg {
@@ -1766,20 +1767,40 @@ header.site-header {
     margin-top: 24px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    /* gap kaldırıldı — kapalı item'lar arasında divider için border-top kullanıyoruz */
 }
 
 .faq__item {
-    border: 1px solid #E5E5E5;
-    border-radius: 12px;
     background: #FFF;
-    overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border-top: 1px solid #E5E5E5;
+    transition: border 0.2s ease, box-shadow 0.2s ease, margin 0.2s ease;
 }
 
+/* İlk kapalı item — en üstte divider olmasın */
+.faq__item:first-child:not([open]) {
+    border-top: none;
+}
+
+/* Açık item her zaman 4-taraflı kutu + radius + komşulardan ayrı margin */
 .faq__item[open] {
-    border-color: #003366;
+    border: 1px solid #003366;
+    border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 51, 102, 0.06);
+    margin: 12px 0;
+    overflow: hidden;
+}
+
+.faq__item[open]:first-child {
+    margin-top: 0;
+}
+
+.faq__item[open]:last-child {
+    margin-bottom: 0;
+}
+
+/* Açık item'dan hemen sonra gelen kapalı item — divider duplicate olmasın */
+.faq__item[open] + .faq__item:not([open]) {
+    border-top: none;
 }
 
 .faq__question {
