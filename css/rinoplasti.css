@@ -192,14 +192,21 @@ header.site-header {
 }
 
 .hero__feature-text strong {
-    color: #1A1A1A;
-    font-size: 15px;
-    font-weight: 600;
+    color: #2E3033;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
 }
 
 .hero__feature-text span {
-    color: #6B6B6B;
-    font-size: 13px;
+    color: #6E6E6E;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .hero__trust {
