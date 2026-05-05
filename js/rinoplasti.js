@@ -115,6 +115,34 @@
     }
 })();
 
+// Simulation: play butonuna basılınca poster gizlenir, YouTube iframe autoplay açılır
+(function () {
+    function initSimulation() {
+        const container = document.getElementById('simulationVideo');
+        if (!container) return;
+        const playBtn = container.querySelector('.simulation__play');
+        if (!playBtn) return;
+
+        playBtn.addEventListener('click', function () {
+            if (container.classList.contains('is-playing')) return;
+
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://www.youtube.com/embed/D4hbBa1zUig?autoplay=1&rel=0';
+            iframe.title = '3D Simülasyon Video';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.setAttribute('allowfullscreen', '');
+            container.appendChild(iframe);
+            container.classList.add('is-playing');
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSimulation);
+    } else {
+        initSimulation();
+    }
+})();
+
 // Steps: hard scroll-lock — section'a girer girmez body fixed olur,
 // hiçbir scroll input'u (wheel/scrollbar/momentum/touch) sayfayı hareket ettiremez.
 // Slide'lar sırayla, cooldown ile geçer. Bittiğinde lock kalkar, normal scroll devam eder.
