@@ -391,7 +391,7 @@ header.site-header {
 
 
 /* RESPONSIVE */
-/* ===== STEPS (scroll-jacked) ===== */
+/* ===== STEPS (scroll-locked) ===== */
 .steps {
     background: #FFFFFF !important;
     position: relative !important;
@@ -405,13 +405,12 @@ header.site-header {
     margin-bottom: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
-    height: 600vh;
+    height: 100vh;
     z-index: 1;
 }
 
 .steps__pin {
-    position: sticky;
-    top: 0;
+    position: relative;
     height: 100vh;
     display: flex;
     align-items: stretch;
@@ -483,7 +482,7 @@ header.site-header {
     box-sizing: border-box;
     transform: translateY(100%);
     opacity: 0;
-    transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.5s ease;
+    transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.7s ease;
     pointer-events: none;
 }
 
