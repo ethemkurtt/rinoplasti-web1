@@ -114,12 +114,13 @@ header.site-header {
 }
 
 .hero__badge {
-    display: inline-block;
+    display: flex;
+    align-items: flex-start;
     align-self: flex-start;
     padding: 8px 16px;
-    border-radius: 999px;
-    background: #FFFFFF;
-    border: 1px solid #E9E5E1;
+    border-radius: 99px;
+    border: 1px solid #E5E5E5;
+    background: #FFF;
     color: #1A1A1A;
     font-size: 14px;
     font-weight: 500;
