@@ -413,6 +413,8 @@ header.site-header {
     position: sticky;
     top: 0;
     height: 100vh;
+    padding-top: 100px; /* fixed header için boşluk — line ve içerik header altından başlar */
+    box-sizing: border-box;
     display: flex;
     align-items: stretch;
     width: 100%;
