@@ -89,3 +89,28 @@
         initCounters();
     }
 })();
+
+// Results slider: ok butonuna tıklayınca yatay scroll
+(function () {
+    function initResultsSlider() {
+        const track = document.getElementById('ekResultsTrack');
+        const next = document.querySelector('.ek-results__arrow--next');
+        if (!track || !next) return;
+
+        next.addEventListener('click', function () {
+            const step = track.clientWidth * 0.7;
+            const max = track.scrollWidth - track.clientWidth;
+            if (track.scrollLeft >= max - 8) {
+                track.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                track.scrollBy({ left: step, behavior: 'smooth' });
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initResultsSlider);
+    } else {
+        initResultsSlider();
+    }
+})();
