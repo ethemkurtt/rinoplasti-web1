@@ -115,6 +115,29 @@
     }
 })();
 
+// FAQ: <details> accordion — tek anda yalnızca 1 soru açık kalır
+(function () {
+    function initFAQ() {
+        const items = document.querySelectorAll('.faq__item');
+        if (!items.length) return;
+
+        items.forEach(function (item) {
+            item.addEventListener('toggle', function () {
+                if (!item.open) return;
+                items.forEach(function (other) {
+                    if (other !== item && other.open) other.open = false;
+                });
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFAQ);
+    } else {
+        initFAQ();
+    }
+})();
+
 // Reviews: data-rating ile yıldız render + drag-to-scroll + arrow
 (function () {
     const STAR_PATH = 'M6.55222 0.901222C6.73607 0.531194 7.26393 0.531195 7.44778 0.901223L8.94927 3.92323C9.02208 4.06976 9.16197 4.1714 9.32383 4.19536L12.6619 4.68951C13.0706 4.75002 13.2338 5.25204 12.9387 5.54123L10.5285 7.90309C10.4117 8.01761 10.3582 8.18207 10.3855 8.34341L10.947 11.6708C11.0158 12.0782 10.5887 12.3885 10.2225 12.1972L7.23149 10.6349C7.08646 10.5592 6.91354 10.5592 6.76851 10.6349L3.77749 12.1972C3.41125 12.3885 2.98421 12.0782 3.05297 11.6708L3.61453 8.34341C3.64176 8.18207 3.58832 8.01761 3.47146 7.90309L1.06135 5.54123C0.766242 5.25204 0.929358 4.75002 1.33809 4.68951L4.67617 4.19536C4.83803 4.1714 4.97792 4.06976 5.05073 3.92323L6.55222 0.901222Z';
