@@ -115,7 +115,8 @@
     }
 })();
 
-// Steps: scroll-driven dikey slider (rate-limited, en fazla 1 slide / cooldown)
+// Steps: scroll-jacked dikey slider — section pin durumunda her wheel/touch = 1 slide,
+// tüm slide'lar bitmeden section'dan çıkış yok, hızlı scroll'da bile atlama olmaz.
 (function () {
     function initSteps() {
         const section = document.getElementById('stepsSection');
@@ -126,64 +127,131 @@
         const total = slides.length;
         if (!total) return;
 
-        const COOLDOWN = 700; // her geçiş arası min süre — hızlı scroll'da bile 1 slide / 700ms
+        const COOLDOWN = 700; // her slide geçişi arası min süre (ms)
+        const TOUCH_THRESHOLD = 30; // touch'ta tetikleme için min hareket (px)
 
-        let displayedSlide = 0;
+        let currentSlide = 0;
         let lastTransition = 0;
-        let rafId = null;
-
-        function getTargetSlide() {
-            const rect = section.getBoundingClientRect();
-            const totalScroll = section.offsetHeight - window.innerHeight;
-            if (totalScroll <= 0) return 0;
-            const scrolled = -rect.top;
-            const progress = Math.max(0, Math.min(1, scrolled / totalScroll));
-            let target = Math.floor(progress * total);
-            if (target >= total) target = total - 1;
-            if (target < 0) target = 0;
-            return target;
-        }
 
         function render() {
             slides.forEach(function (s, i) {
-                s.classList.toggle('is-active', i === displayedSlide);
-                s.classList.toggle('is-past', i < displayedSlide);
+                s.classList.toggle('is-active', i === currentSlide);
+                s.classList.toggle('is-past', i < currentSlide);
             });
             dots.forEach(function (d, i) {
-                d.classList.toggle('is-active', i <= displayedSlide);
-                d.classList.toggle('is-current', i === displayedSlide);
+                d.classList.toggle('is-active', i <= currentSlide);
+                d.classList.toggle('is-current', i === currentSlide);
             });
             if (lineFill) {
-                const pct = total > 1 ? (displayedSlide / (total - 1)) * 100 : 100;
+                const pct = total > 1 ? (currentSlide / (total - 1)) * 100 : 100;
                 lineFill.style.height = pct + '%';
             }
         }
 
-        function loop() {
-            const target = getTargetSlide();
-            const now = Date.now();
+        // Section viewport'u dolduruyor mu? (üstü ≤ 0 ve altı > 0)
+        function isInLockZone() {
+            const rect = section.getBoundingClientRect();
+            return rect.top <= 0 && rect.bottom > 0;
+        }
 
-            if (target !== displayedSlide && now - lastTransition >= COOLDOWN) {
-                displayedSlide += (target > displayedSlide) ? 1 : -1;
+        // direction: 1 = aşağı, -1 = yukarı. Cooldown geçtiyse slide ilerlet.
+        function tryAdvance(direction) {
+            const now = Date.now();
+            if (now - lastTransition < COOLDOWN) return false;
+
+            if (direction > 0 && currentSlide < total - 1) {
+                currentSlide++;
                 lastTransition = now;
                 render();
+                return true;
+            } else if (direction < 0 && currentSlide > 0) {
+                currentSlide--;
+                lastTransition = now;
+                render();
+                return true;
             }
+            return false;
+        }
 
-            if (target !== displayedSlide) {
-                // Hala fark var, devam et (cooldown geçince yeni geçiş)
-                rafId = requestAnimationFrame(loop);
-            } else {
-                rafId = null;
+        // Section üstünü viewport top'a hizala (kayma olmuşsa düzelt)
+        function pinSectionTop() {
+            const rect = section.getBoundingClientRect();
+            if (rect.top < 0) {
+                window.scrollBy(0, rect.top);
             }
         }
 
-        function tick() {
-            if (rafId) return;
-            rafId = requestAnimationFrame(loop);
+        // ===== WHEEL =====
+        function handleWheel(e) {
+            if (!isInLockZone()) return;
+
+            const deltaY = e.deltaY;
+            if (deltaY === 0) return;
+
+            // Son slide & aşağı scroll → serbest bırak
+            if (deltaY > 0 && currentSlide >= total - 1) return;
+            // İlk slide & yukarı scroll → serbest bırak
+            if (deltaY < 0 && currentSlide <= 0) return;
+
+            // Section'a kilitli — scroll'u engelle
+            e.preventDefault();
+            pinSectionTop();
+            tryAdvance(deltaY > 0 ? 1 : -1);
         }
 
-        window.addEventListener('scroll', tick, { passive: true });
-        window.addEventListener('resize', tick);
+        // ===== TOUCH =====
+        let touchStartY = 0;
+        let touchAccum = 0;
+
+        function handleTouchStart(e) {
+            touchStartY = e.touches[0].clientY;
+            touchAccum = 0;
+        }
+
+        function handleTouchMove(e) {
+            if (!isInLockZone()) return;
+
+            const touchY = e.touches[0].clientY;
+            const totalDelta = touchStartY - touchY;
+
+            // Son slide & aşağı kaydırma → serbest
+            if (totalDelta > 0 && currentSlide >= total - 1) return;
+            // İlk slide & yukarı kaydırma → serbest
+            if (totalDelta < 0 && currentSlide <= 0) return;
+
+            e.preventDefault();
+            pinSectionTop();
+
+            // Eşik aşıldıysa 1 slide ilerlet, başlangıcı sıfırla
+            if (Math.abs(totalDelta) >= TOUCH_THRESHOLD) {
+                if (tryAdvance(totalDelta > 0 ? 1 : -1)) {
+                    touchStartY = touchY;
+                }
+            }
+        }
+
+        // ===== KEYBOARD =====
+        function handleKey(e) {
+            if (!isInLockZone()) return;
+
+            const downKeys = ['ArrowDown', 'PageDown', ' ', 'Spacebar'];
+            const upKeys = ['ArrowUp', 'PageUp'];
+            const isDown = downKeys.indexOf(e.key) !== -1;
+            const isUp = upKeys.indexOf(e.key) !== -1;
+            if (!isDown && !isUp) return;
+
+            if (isDown && currentSlide >= total - 1) return;
+            if (isUp && currentSlide <= 0) return;
+
+            e.preventDefault();
+            tryAdvance(isDown ? 1 : -1);
+        }
+
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('touchstart', handleTouchStart, { passive: true });
+        window.addEventListener('touchmove', handleTouchMove, { passive: false });
+        window.addEventListener('keydown', handleKey);
+
         render();
     }
 
