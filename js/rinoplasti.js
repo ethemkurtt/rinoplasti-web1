@@ -159,9 +159,9 @@
         const total = slides.length;
         if (!total) return;
 
-        const BURST_END_DELAY     = 100;  // event-free süre — burst bittikten sonra yeni aksiyon mümkün
-        const EXIT_COOLDOWN       = 400;  // exit sonrası re-lock yasağı (ms)
-        const LOCK_TOLERANCE      = 150;  // rect.top viewport top'a bu kadar yakınsa lock; daha uzaksa skip
+        const BURST_END_DELAY     = 50;   // event-free süre — burst bittikten sonra yeni aksiyon mümkün
+        const EXIT_COOLDOWN       = 200;  // exit sonrası re-lock yasağı (ms)
+        const LOCK_TOLERANCE      = 25;   // rect.top viewport top'a bu kadar yakınsa lock; daha uzaksa skip
         const EXIT_OVERSHOOT_DOWN = 10;   // aşağı exit'te section bottom + bu kadar (px)
         const EXIT_OVERSHOOT_UP   = LOCK_TOLERANCE + 50; // yukarı exit'te section top - bu kadar; tolerance'tan BÜYÜK olmalı
         const TOUCH_THRESHOLD     = 30;   // touch advance için min hareket (px)
