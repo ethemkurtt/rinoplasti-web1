@@ -1,19 +1,32 @@
 // Rinoplasti Landing Page Scripts
 
-// Header: scroll yapınca fixed + animasyon
+// Header: Elementor wrapper'ından koparıp body'e taşı + scroll animasyonu
 (function () {
-    const header = document.getElementById('siteHeader');
-    if (!header) return;
+    function initHeader() {
+        const header = document.getElementById('siteHeader');
+        if (!header) return;
 
-    const triggerPoint = 120;
-
-    function onScroll() {
-        if (window.scrollY > triggerPoint) {
-            header.classList.add('is-fixed');
-        } else {
-            header.classList.remove('is-fixed');
+        if (header.parentElement !== document.body) {
+            document.body.appendChild(header);
         }
+
+        const triggerPoint = 120;
+
+        function onScroll() {
+            if (window.scrollY > triggerPoint) {
+                header.classList.add('is-fixed');
+            } else {
+                header.classList.remove('is-fixed');
+            }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeader);
+    } else {
+        initHeader();
+    }
 })();
