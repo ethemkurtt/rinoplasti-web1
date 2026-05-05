@@ -128,20 +128,29 @@ header.site-header {
 
 .hero__title {
     margin: 0;
-    font-size: clamp(40px, 5vw, 64px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    font-family: "Sofia Pro", "Mulish", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 52px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 60px;
 }
 
 .hero__title-orange {
     display: block;
-    color: #F58462;
+    color: #F98755;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
 }
 
 .hero__title-blue {
     display: block;
-    color: #1B3D8B;
+    color: #003366;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
 }
 
 .hero__features {
