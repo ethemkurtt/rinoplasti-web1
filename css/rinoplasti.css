@@ -311,7 +311,8 @@ header.site-header {
 .hero__rating-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .hero__avatars {
@@ -344,6 +345,7 @@ header.site-header {
     font-style: normal;
     font-weight: 600;
     line-height: normal;
+    white-space: nowrap;
 }
 
 /* RIGHT SIDE */
