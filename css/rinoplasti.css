@@ -214,9 +214,7 @@ header.site-header {
 .hero__trust {
     width: 100%;
     margin-top: 4px;
-    border-radius: 8px;
     overflow: hidden;
-    background: #F5F2EE;
     padding: 14px 0;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
             mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
@@ -224,8 +222,8 @@ header.site-header {
 
 .hero__trust-track {
     display: flex;
-    align-items: center;
-    gap: 56px;
+    align-items: flex-start;
+    gap: 6.531px;
     width: max-content;
     animation: heroTrustScroll 28s linear infinite;
 }
@@ -237,7 +235,6 @@ header.site-header {
     object-fit: cover;
     object-position: 50% 50%;
     flex: 0 0 auto;
-    background: lightgray;
 }
 
 @keyframes heroTrustScroll {
