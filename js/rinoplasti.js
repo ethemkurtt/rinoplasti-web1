@@ -159,10 +159,12 @@
         const total = slides.length;
         if (!total) return;
 
-        const BURST_END_DELAY = 250;   // event-free süre — burst bittikten sonra yeni aksiyon mümkün
-        const EXIT_COOLDOWN   = 600;   // exit sonrası re-lock yasağı (ms)
-        const EXIT_OVERSHOOT  = 10;    // exit'te section dışına scroll buffer'ı (px)
-        const TOUCH_THRESHOLD = 30;    // touch advance için min hareket (px)
+        const BURST_END_DELAY     = 100;  // event-free süre — burst bittikten sonra yeni aksiyon mümkün
+        const EXIT_COOLDOWN       = 400;  // exit sonrası re-lock yasağı (ms)
+        const LOCK_TOLERANCE      = 150;  // rect.top viewport top'a bu kadar yakınsa lock; daha uzaksa skip
+        const EXIT_OVERSHOOT_DOWN = 10;   // aşağı exit'te section bottom + bu kadar (px)
+        const EXIT_OVERSHOOT_UP   = LOCK_TOLERANCE + 50; // yukarı exit'te section top - bu kadar; tolerance'tan BÜYÜK olmalı
+        const TOUCH_THRESHOLD     = 30;   // touch advance için min hareket (px)
 
         let currentSlide = 0;
         let isLocked = false;
@@ -234,12 +236,12 @@
 
         function exitDown() {
             exitTime = Date.now();
-            unlockBody(lockedScrollY + section.offsetHeight + EXIT_OVERSHOOT);
+            unlockBody(lockedScrollY + section.offsetHeight + EXIT_OVERSHOOT_DOWN);
         }
 
         function exitUp() {
             exitTime = Date.now();
-            unlockBody(lockedScrollY - EXIT_OVERSHOOT);
+            unlockBody(lockedScrollY - EXIT_OVERSHOOT_UP);
         }
 
         function checkAndLock() {
@@ -247,9 +249,16 @@
             if (Date.now() - exitTime < EXIT_COOLDOWN) return;
 
             const rect = section.getBoundingClientRect();
-            if (rect.top > 0 || rect.bottom <= 0) return;
 
-            if (rect.top < 0) window.scrollBy(0, rect.top);
+            // Section view dışı
+            if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
+
+            // Section'ın üstü viewport top'a yakın mı? Değilse lock yapma —
+            // yukarıdan aşağı veya aşağıdan yukarı yaklaşırken section üstü 0'a değdiğinde lock.
+            // Bu büyük snap'i önler ve exitUp sonrası anlık re-lock'u kırar.
+            if (Math.abs(rect.top) > LOCK_TOLERANCE) return;
+
+            if (rect.top !== 0) window.scrollBy(0, rect.top);
             lockBody();
         }
 
