@@ -229,11 +229,13 @@ header.site-header {
 }
 
 .hero__trust-track img {
-    height: 36px;
+    height: 40px;
+    aspect-ratio: 71/40;
     width: auto;
+    object-fit: cover;
+    object-position: 50% 50%;
     flex: 0 0 auto;
-    opacity: 0.7;
-    filter: grayscale(1);
+    background: lightgray;
 }
 
 @keyframes heroTrustScroll {
