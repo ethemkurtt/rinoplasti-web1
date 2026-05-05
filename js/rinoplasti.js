@@ -115,6 +115,93 @@
     }
 })();
 
+// Reviews: data-rating ile yıldız render + drag-to-scroll + arrow
+(function () {
+    const STAR_PATH = 'M6.55222 0.901222C6.73607 0.531194 7.26393 0.531195 7.44778 0.901223L8.94927 3.92323C9.02208 4.06976 9.16197 4.1714 9.32383 4.19536L12.6619 4.68951C13.0706 4.75002 13.2338 5.25204 12.9387 5.54123L10.5285 7.90309C10.4117 8.01761 10.3582 8.18207 10.3855 8.34341L10.947 11.6708C11.0158 12.0782 10.5887 12.3885 10.2225 12.1972L7.23149 10.6349C7.08646 10.5592 6.91354 10.5592 6.76851 10.6349L3.77749 12.1972C3.41125 12.3885 2.98421 12.0782 3.05297 11.6708L3.61453 8.34341C3.64176 8.18207 3.58832 8.01761 3.47146 7.90309L1.06135 5.54123C0.766242 5.25204 0.929358 4.75002 1.33809 4.68951L4.67617 4.19536C4.83803 4.1714 4.97792 4.06976 5.05073 3.92323L6.55222 0.901222Z';
+
+    function renderStars() {
+        const groups = document.querySelectorAll('.review__stars[data-rating]');
+        groups.forEach(function (el) {
+            const rating = parseFloat(el.dataset.rating) || 0;
+            const total = 5;
+            let html = '';
+            for (let i = 0; i < total; i++) {
+                const fill = (i < rating) ? '#FEA500' : '#FEDA98';
+                html += '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="' + STAR_PATH + '" fill="' + fill + '"/></svg>';
+            }
+            el.innerHTML = html;
+        });
+    }
+
+    function initReviewsSlider() {
+        const track = document.getElementById('reviewsTrack');
+        if (!track) return;
+        const arrow = document.querySelector('.reviews__arrow');
+
+        if (arrow) {
+            arrow.addEventListener('click', function () {
+                const step = track.clientWidth * 0.7;
+                const max = track.scrollWidth - track.clientWidth;
+                if (track.scrollLeft >= max - 8) {
+                    track.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: step, behavior: 'smooth' });
+                }
+            });
+        }
+
+        // Mouse drag-to-scroll
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+        let dragMoved = false;
+        const DRAG_THRESHOLD = 5;
+
+        track.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return;
+            isDown = true;
+            dragMoved = false;
+            startX = e.pageX;
+            scrollStart = track.scrollLeft;
+            track.classList.add('is-dragging');
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', function (e) {
+            if (!isDown) return;
+            const dx = e.pageX - startX;
+            if (Math.abs(dx) > DRAG_THRESHOLD) dragMoved = true;
+            track.scrollLeft = scrollStart - dx;
+        });
+
+        window.addEventListener('mouseup', function () {
+            if (!isDown) return;
+            isDown = false;
+            track.classList.remove('is-dragging');
+            setTimeout(function () { dragMoved = false; }, 0);
+        });
+
+        // Drag sırasında link click'lerini iptal et
+        track.addEventListener('click', function (e) {
+            if (dragMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    }
+
+    function init() {
+        renderStars();
+        initReviewsSlider();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
 // Transformations slider: arrow + mouse drag-to-scroll + per-card play (iframe autoplay)
 (function () {
     function initTransformations() {
