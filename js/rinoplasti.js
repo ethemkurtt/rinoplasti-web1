@@ -114,3 +114,60 @@
         initResultsSlider();
     }
 })();
+
+// Steps: scroll-jacked dikey slider
+(function () {
+    function initSteps() {
+        const section = document.getElementById('stepsSection');
+        if (!section) return;
+        const slides = section.querySelectorAll('.steps__slide');
+        const lineFill = section.querySelector('.steps__line-fill');
+        const total = slides.length;
+        if (!total) return;
+
+        function update() {
+            const rect = section.getBoundingClientRect();
+            const sectionHeight = section.offsetHeight;
+            const vh = window.innerHeight;
+            const totalScroll = sectionHeight - vh;
+            if (totalScroll <= 0) return;
+
+            const scrolled = -rect.top;
+            const progress = Math.max(0, Math.min(1, scrolled / totalScroll));
+
+            // Her adıma 1/total'lik segment ayır, hangi segmentteyiz?
+            let activeIdx = Math.floor(progress * total);
+            if (activeIdx >= total) activeIdx = total - 1;
+
+            slides.forEach(function (slide, i) {
+                slide.classList.toggle('is-active', i === activeIdx);
+                slide.classList.toggle('is-past', i < activeIdx);
+            });
+
+            if (lineFill) {
+                lineFill.style.height = (progress * 100) + '%';
+            }
+        }
+
+        let ticking = false;
+        function onScroll() {
+            if (!ticking) {
+                requestAnimationFrame(function () {
+                    update();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', update);
+        update();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSteps);
+    } else {
+        initSteps();
+    }
+})();
