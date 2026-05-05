@@ -115,154 +115,76 @@
     }
 })();
 
-// Steps: scroll-locked dikey slider (wheel/touch tek seferde 1 slide ilerler, 1sn cooldown)
+// Steps: scroll-driven dikey slider (rate-limited, en fazla 1 slide / cooldown)
 (function () {
     function initSteps() {
         const section = document.getElementById('stepsSection');
         if (!section) return;
         const slides = section.querySelectorAll('.steps__slide');
+        const dots = section.querySelectorAll('.steps__dot');
         const lineFill = section.querySelector('.steps__line-fill');
         const total = slides.length;
         if (!total) return;
 
-        const COOLDOWN = 1000;     // her geçiş arası min 1 saniye
-        const RELOCK_DELAY = 600;  // unlock sonrası tekrar lock olabilmesi için min süre
+        const COOLDOWN = 700; // her geçiş arası min süre — hızlı scroll'da bile 1 slide / 700ms
 
-        let currentSlide = 0;
+        let displayedSlide = 0;
         let lastTransition = 0;
-        let isLocked = false;
-        let lockedScrollY = 0;
-        let lastUnlock = 0;
+        let rafId = null;
 
-        const dots = section.querySelectorAll('.steps__dot');
+        function getTargetSlide() {
+            const rect = section.getBoundingClientRect();
+            const totalScroll = section.offsetHeight - window.innerHeight;
+            if (totalScroll <= 0) return 0;
+            const scrolled = -rect.top;
+            const progress = Math.max(0, Math.min(1, scrolled / totalScroll));
+            let target = Math.floor(progress * total);
+            if (target >= total) target = total - 1;
+            if (target < 0) target = 0;
+            return target;
+        }
 
-        function update() {
+        function render() {
             slides.forEach(function (s, i) {
-                s.classList.toggle('is-active', i === currentSlide);
-                s.classList.toggle('is-past', i < currentSlide);
+                s.classList.toggle('is-active', i === displayedSlide);
+                s.classList.toggle('is-past', i < displayedSlide);
             });
             dots.forEach(function (d, i) {
-                d.classList.toggle('is-active', i <= currentSlide);
-                d.classList.toggle('is-current', i === currentSlide);
+                d.classList.toggle('is-active', i <= displayedSlide);
+                d.classList.toggle('is-current', i === displayedSlide);
             });
             if (lineFill) {
-                const pct = total > 1 ? (currentSlide / (total - 1)) * 100 : 100;
+                const pct = total > 1 ? (displayedSlide / (total - 1)) * 100 : 100;
                 lineFill.style.height = pct + '%';
             }
         }
 
-        function getScrollbarWidth() {
-            return window.innerWidth - document.documentElement.clientWidth;
-        }
-
-        function lock() {
-            if (isLocked) return;
-            isLocked = true;
-            lockedScrollY = window.scrollY;
-            const sbw = getScrollbarWidth();
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
-            if (sbw > 0) document.body.style.paddingRight = sbw + 'px';
-        }
-
-        function unlock(direction) {
-            if (!isLocked) return;
-            isLocked = false;
-            lastUnlock = Date.now();
-            document.documentElement.style.overflow = '';
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-            // Section'ı tamamen geç (relock olmasın)
-            if (direction === 'down') {
-                window.scrollTo(0, lockedScrollY + window.innerHeight + 2);
-            } else if (direction === 'up') {
-                window.scrollTo(0, Math.max(0, lockedScrollY - 2));
-            }
-        }
-
-        function maybeLock() {
-            if (isLocked) return;
-            if (Date.now() - lastUnlock < RELOCK_DELAY) return;
-            const rect = section.getBoundingClientRect();
-            const vh = window.innerHeight;
-            // Section viewport'u tamamen kapsadığında lock
-            if (rect.top <= 1 && rect.bottom >= vh - 1) {
-                // Kesin alignment için snap
-                window.scrollTo(0, window.scrollY + rect.top);
-                lock();
-                update();
-            }
-        }
-
-        function step(dir) {
-            if (!isLocked) return;
+        function loop() {
+            const target = getTargetSlide();
             const now = Date.now();
-            if (now - lastTransition < COOLDOWN) return;
 
-            if (dir > 0) {
-                if (currentSlide < total - 1) {
-                    currentSlide++;
-                    lastTransition = now;
-                    update();
-                } else {
-                    unlock('down');
-                }
+            if (target !== displayedSlide && now - lastTransition >= COOLDOWN) {
+                displayedSlide += (target > displayedSlide) ? 1 : -1;
+                lastTransition = now;
+                render();
+            }
+
+            if (target !== displayedSlide) {
+                // Hala fark var, devam et (cooldown geçince yeni geçiş)
+                rafId = requestAnimationFrame(loop);
             } else {
-                if (currentSlide > 0) {
-                    currentSlide--;
-                    lastTransition = now;
-                    update();
-                } else {
-                    unlock('up');
-                }
+                rafId = null;
             }
         }
 
-        window.addEventListener('scroll', maybeLock, { passive: true });
+        function tick() {
+            if (rafId) return;
+            rafId = requestAnimationFrame(loop);
+        }
 
-        // Wheel
-        window.addEventListener('wheel', function (e) {
-            if (!isLocked) return;
-            e.preventDefault();
-            // Çok küçük delta'ları yok say (trackpad mikro hareket)
-            if (Math.abs(e.deltaY) < 4) return;
-            step(e.deltaY > 0 ? 1 : -1);
-        }, { passive: false });
-
-        // Touch
-        let touchStartY = 0;
-        window.addEventListener('touchstart', function (e) {
-            if (!isLocked) return;
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
-
-        window.addEventListener('touchmove', function (e) {
-            if (!isLocked) return;
-            e.preventDefault();
-        }, { passive: false });
-
-        window.addEventListener('touchend', function (e) {
-            if (!isLocked) return;
-            const endY = e.changedTouches[0].clientY;
-            const delta = touchStartY - endY;
-            if (Math.abs(delta) > 50) {
-                step(delta > 0 ? 1 : -1);
-            }
-        }, { passive: true });
-
-        // Klavye desteği
-        window.addEventListener('keydown', function (e) {
-            if (!isLocked) return;
-            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-                e.preventDefault();
-                step(1);
-            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-                e.preventDefault();
-                step(-1);
-            }
-        });
-
-        update();
+        window.addEventListener('scroll', tick, { passive: true });
+        window.addEventListener('resize', tick);
+        render();
     }
 
     if (document.readyState === 'loading') {

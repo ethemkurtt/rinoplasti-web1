@@ -391,7 +391,7 @@ header.site-header {
 
 
 /* RESPONSIVE */
-/* ===== STEPS (scroll-locked) ===== */
+/* ===== STEPS (scroll-driven, rate-limited) ===== */
 .steps {
     background: #FFFFFF !important;
     position: relative !important;
@@ -405,12 +405,13 @@ header.site-header {
     margin-bottom: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
-    height: 100vh;
+    height: 600vh;
     z-index: 1;
 }
 
 .steps__pin {
-    position: relative;
+    position: sticky;
+    top: 0;
     height: 100vh;
     display: flex;
     align-items: stretch;
