@@ -92,7 +92,7 @@ header.site-header {
     right: 50% !important;
     margin-left: -50vw !important;
     margin-right: -50vw !important;
-    margin-top: 0 !important;
+    margin-top: -20px !important;
     margin-bottom: 0 !important;
     padding: 160px 48px 80px !important;
     box-sizing: border-box !important;
