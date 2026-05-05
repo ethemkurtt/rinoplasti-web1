@@ -103,7 +103,7 @@ header.site-header {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 64px;
-    align-items: center;
+    align-items: start;
 }
 
 .hero__left {
@@ -317,8 +317,8 @@ header.site-header {
 .hero__image-wrap {
     position: relative;
     width: 100%;
-    max-width: 560px;
-    aspect-ratio: 1 / 1;
+    max-width: 620px;
+    aspect-ratio: 4 / 5;
     border-radius: 24px;
     background: #EFEAE3;
     overflow: hidden;
