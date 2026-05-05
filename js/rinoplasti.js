@@ -179,7 +179,7 @@
             }
         }
 
-        // Body'i scroll yapamaz hale getir. Görsel pozisyon korunur (top: -scrollY).
+        // Body'i scroll yapamaz hale getir. scrollY korunur (sıçrama yok).
         function lockBody() {
             if (isLocked) return;
             isLocked = true;
@@ -187,11 +187,9 @@
 
             const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
-            document.body.style.position = 'fixed';
-            document.body.style.top = '-' + lockedScrollY + 'px';
-            document.body.style.left = '0';
-            document.body.style.right = '0';
-            document.body.style.width = '100%';
+            // overflow: hidden — scroll fiziksel olarak durur, position değişmez
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
             if (scrollbarWidth > 0) {
                 document.body.style.paddingRight = scrollbarWidth + 'px';
             }
@@ -202,15 +200,13 @@
             if (!isLocked) return;
             isLocked = false;
 
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.left = '';
-            document.body.style.right = '';
-            document.body.style.width = '';
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
             document.body.style.paddingRight = '';
 
-            const target = (typeof targetScrollY === 'number') ? targetScrollY : lockedScrollY;
-            window.scrollTo(0, target);
+            if (typeof targetScrollY === 'number') {
+                window.scrollTo(0, targetScrollY);
+            }
         }
 
         function tryAdvance(direction) {
@@ -329,9 +325,15 @@
             tryAdvance(isDown ? 1 : -1);
         }
 
-        // Scroll event + rAF safety net — section'a hızlı geçişte de yakala
+        // rAF safety net — section'a hızlı geçişte yakala, lock'ta kayma olursa düzelt
         function rafLoop() {
-            if (!isLocked) checkAndLock();
+            if (isLocked) {
+                if (Math.abs(window.scrollY - lockedScrollY) > 0.5) {
+                    window.scrollTo(0, lockedScrollY);
+                }
+            } else {
+                checkAndLock();
+            }
             requestAnimationFrame(rafLoop);
         }
 
