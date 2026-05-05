@@ -30,3 +30,62 @@
         initHeader();
     }
 })();
+
+// Stats: 0'dan hedefe sayma animasyonu (görünür olunca tetiklenir)
+(function () {
+    function initCounters() {
+        const counters = document.querySelectorAll('.stat__num');
+        if (!counters.length) return;
+
+        function fmt(n, format) {
+            if (format === 'dot') {
+                return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+            return n.toString();
+        }
+
+        function animate(el) {
+            const target = parseInt(el.dataset.target, 10) || 0;
+            const suffix = el.dataset.suffix || '';
+            const format = el.dataset.format || '';
+            const duration = 1800;
+            const start = performance.now();
+
+            function tick(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(target * eased);
+                el.textContent = fmt(current, format) + suffix;
+                if (progress < 1) {
+                    requestAnimationFrame(tick);
+                } else {
+                    el.textContent = fmt(target, format) + suffix;
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+
+        if (!('IntersectionObserver' in window)) {
+            counters.forEach(animate);
+            return;
+        }
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    animate(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.4 });
+
+        counters.forEach(function (c) { observer.observe(c); });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCounters);
+    } else {
+        initCounters();
+    }
+})();
