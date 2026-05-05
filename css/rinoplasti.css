@@ -230,10 +230,7 @@ header.site-header {
 
 .hero__trust-track img {
     height: 40px;
-    aspect-ratio: 71/40;
     width: auto;
-    object-fit: cover;
-    object-position: 50% 50%;
     flex: 0 0 auto;
 }
 
