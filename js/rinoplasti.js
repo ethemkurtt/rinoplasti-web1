@@ -115,8 +115,9 @@
     }
 })();
 
-// Steps: scroll-jacked dikey slider — section pin durumunda her wheel/touch = 1 slide,
-// tüm slide'lar bitmeden section'dan çıkış yok, hızlı scroll'da bile atlama olmaz.
+// Steps: hard scroll-lock — section'a girer girmez body fixed olur,
+// hiçbir scroll input'u (wheel/scrollbar/momentum/touch) sayfayı hareket ettiremez.
+// Slide'lar sırayla, cooldown ile geçer. Bittiğinde lock kalkar, normal scroll devam eder.
 (function () {
     function initSteps() {
         const section = document.getElementById('stepsSection');
@@ -127,11 +128,13 @@
         const total = slides.length;
         if (!total) return;
 
-        const COOLDOWN = 700; // her slide geçişi arası min süre (ms)
-        const TOUCH_THRESHOLD = 30; // touch'ta tetikleme için min hareket (px)
+        const COOLDOWN = 700;
+        const TOUCH_THRESHOLD = 30;
 
         let currentSlide = 0;
         let lastTransition = 0;
+        let isLocked = false;
+        let lockedScrollY = 0;
 
         function render() {
             slides.forEach(function (s, i) {
@@ -148,13 +151,40 @@
             }
         }
 
-        // Section viewport'u dolduruyor mu? (üstü ≤ 0 ve altı > 0)
-        function isInLockZone() {
-            const rect = section.getBoundingClientRect();
-            return rect.top <= 0 && rect.bottom > 0;
+        // Body'i scroll yapamaz hale getir. Görsel pozisyon korunur (top: -scrollY).
+        function lockBody() {
+            if (isLocked) return;
+            isLocked = true;
+            lockedScrollY = window.scrollY;
+
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+            document.body.style.position = 'fixed';
+            document.body.style.top = '-' + lockedScrollY + 'px';
+            document.body.style.left = '0';
+            document.body.style.right = '0';
+            document.body.style.width = '100%';
+            if (scrollbarWidth > 0) {
+                document.body.style.paddingRight = scrollbarWidth + 'px';
+            }
         }
 
-        // direction: 1 = aşağı, -1 = yukarı. Cooldown geçtiyse slide ilerlet.
+        // Body'i serbest bırak, hedeflenen pozisyona scroll et.
+        function unlockBody(targetScrollY) {
+            if (!isLocked) return;
+            isLocked = false;
+
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.width = '';
+            document.body.style.paddingRight = '';
+
+            const target = (typeof targetScrollY === 'number') ? targetScrollY : lockedScrollY;
+            window.scrollTo(0, target);
+        }
+
         function tryAdvance(direction) {
             const now = Date.now();
             if (now - lastTransition < COOLDOWN) return false;
@@ -173,56 +203,78 @@
             return false;
         }
 
-        // Section üstünü viewport top'a hizala (kayma olmuşsa düzelt)
-        function pinSectionTop() {
+        // Section viewport top'a değdi mi? Değdiyse hizala + lock.
+        function checkAndLock() {
+            if (isLocked) return;
             const rect = section.getBoundingClientRect();
+            if (rect.top > 0 || rect.bottom <= 0) return; // section view dışı
+
+            // Section üstünü viewport top'a snap — kullanıcı hızlı geçtiyse geri çek
             if (rect.top < 0) {
                 window.scrollBy(0, rect.top);
             }
+            lockBody();
+        }
+
+        // Section'dan aşağı çıkış: lock'u kaldır, section altına scroll
+        function exitDown() {
+            unlockBody(lockedScrollY + section.offsetHeight);
+        }
+
+        // Section'dan yukarı çıkış: lock'u kaldır, section üstüne scroll
+        function exitUp() {
+            unlockBody(lockedScrollY - 1);
         }
 
         // ===== WHEEL =====
         function handleWheel(e) {
-            if (!isInLockZone()) return;
+            // Lock değilsek önce kontrol et — bu wheel section'a gelişi tetiklemiş olabilir
+            if (!isLocked) checkAndLock();
+            if (!isLocked) return;
 
+            e.preventDefault();
             const deltaY = e.deltaY;
             if (deltaY === 0) return;
 
-            // Son slide & aşağı scroll → serbest bırak
-            if (deltaY > 0 && currentSlide >= total - 1) return;
-            // İlk slide & yukarı scroll → serbest bırak
-            if (deltaY < 0 && currentSlide <= 0) return;
+            // Son slide & aşağı → çıkış
+            if (deltaY > 0 && currentSlide >= total - 1) {
+                exitDown();
+                return;
+            }
+            // İlk slide & yukarı → çıkış
+            if (deltaY < 0 && currentSlide <= 0) {
+                exitUp();
+                return;
+            }
 
-            // Section'a kilitli — scroll'u engelle
-            e.preventDefault();
-            pinSectionTop();
             tryAdvance(deltaY > 0 ? 1 : -1);
         }
 
         // ===== TOUCH =====
         let touchStartY = 0;
-        let touchAccum = 0;
 
         function handleTouchStart(e) {
             touchStartY = e.touches[0].clientY;
-            touchAccum = 0;
         }
 
         function handleTouchMove(e) {
-            if (!isInLockZone()) return;
+            if (!isLocked) checkAndLock();
+            if (!isLocked) return;
 
             const touchY = e.touches[0].clientY;
             const totalDelta = touchStartY - touchY;
 
-            // Son slide & aşağı kaydırma → serbest
-            if (totalDelta > 0 && currentSlide >= total - 1) return;
-            // İlk slide & yukarı kaydırma → serbest
-            if (totalDelta < 0 && currentSlide <= 0) return;
+            if (totalDelta > 0 && currentSlide >= total - 1) {
+                exitDown();
+                return;
+            }
+            if (totalDelta < 0 && currentSlide <= 0) {
+                exitUp();
+                return;
+            }
 
             e.preventDefault();
-            pinSectionTop();
 
-            // Eşik aşıldıysa 1 slide ilerlet, başlangıcı sıfırla
             if (Math.abs(totalDelta) >= TOUCH_THRESHOLD) {
                 if (tryAdvance(totalDelta > 0 ? 1 : -1)) {
                     touchStartY = touchY;
@@ -232,7 +284,8 @@
 
         // ===== KEYBOARD =====
         function handleKey(e) {
-            if (!isInLockZone()) return;
+            if (!isLocked) checkAndLock();
+            if (!isLocked) return;
 
             const downKeys = ['ArrowDown', 'PageDown', ' ', 'Spacebar'];
             const upKeys = ['ArrowUp', 'PageUp'];
@@ -240,18 +293,27 @@
             const isUp = upKeys.indexOf(e.key) !== -1;
             if (!isDown && !isUp) return;
 
-            if (isDown && currentSlide >= total - 1) return;
-            if (isUp && currentSlide <= 0) return;
-
             e.preventDefault();
+
+            if (isDown && currentSlide >= total - 1) { exitDown(); return; }
+            if (isUp && currentSlide <= 0) { exitUp(); return; }
+
             tryAdvance(isDown ? 1 : -1);
         }
 
+        // Scroll event + rAF safety net — section'a hızlı geçişte de yakala
+        function rafLoop() {
+            if (!isLocked) checkAndLock();
+            requestAnimationFrame(rafLoop);
+        }
+
+        window.addEventListener('scroll', checkAndLock, { passive: true });
         window.addEventListener('wheel', handleWheel, { passive: false });
         window.addEventListener('touchstart', handleTouchStart, { passive: true });
         window.addEventListener('touchmove', handleTouchMove, { passive: false });
         window.addEventListener('keydown', handleKey);
 
+        requestAnimationFrame(rafLoop);
         render();
     }
 
