@@ -168,18 +168,20 @@ header.site-header {
 
 .hero__feature-icon {
     flex: 0 0 auto;
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    background: #F5F2EE;
-    display: inline-flex;
-    align-items: center;
+    display: flex;
+    width: 48px;
+    height: 48px;
+    padding: 8px;
     justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    background: #F1F8FF;
+    box-sizing: border-box;
 }
 
 .hero__feature-icon img {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
 }
 
