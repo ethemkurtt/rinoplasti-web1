@@ -64,11 +64,13 @@ header.site-header {
     display: block;
 }
 
-/* Elementor wrapper override (hero/stats'ı sarmalayan container) */
+/* Elementor wrapper override (hero/stats/problems'ı sarmalayan container) */
 .elementor-element.e-con:has(.hero),
 .elementor-element.e-con:has(.stats),
+.elementor-element.e-con:has(.problems),
 .e-con:has(.hero),
 .e-con:has(.stats),
+.e-con:has(.problems),
 .elementor-element-2dcf0a8 {
     padding: 0 !important;
     width: 100% !important;
@@ -77,6 +79,7 @@ header.site-header {
 
 .e-con:has(.hero) > .e-con-inner,
 .e-con:has(.stats) > .e-con-inner,
+.e-con:has(.problems) > .e-con-inner,
 .elementor-element-2dcf0a8 > .e-con-inner {
     margin: 0 !important;
     padding: 0 !important;
@@ -262,10 +265,11 @@ header.site-header {
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.hero__cta:hover {
-    background: #E8743F;
+.hero__cta:hover,
+.problems__cta:hover {
+    background: #003366;
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(249, 135, 85, 0.35);
+    box-shadow: 0 10px 24px rgba(0, 51, 102, 0.25);
 }
 
 .hero__rating {
@@ -378,6 +382,131 @@ header.site-header {
 
 
 /* RESPONSIVE */
+/* ===== PROBLEMS ===== */
+.problems {
+    background: #FFFFFF !important;
+    position: relative !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 50% !important;
+    right: 50% !important;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 80px 48px !important;
+    box-sizing: border-box !important;
+    z-index: 1;
+}
+
+.problems__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.problems__badge {
+    display: inline-flex;
+    padding: 8px 16px;
+    border-radius: 99px;
+    border: 1px solid #E5E5E5;
+    background: #FFF;
+    color: #1A1A1A;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.problems__title {
+    margin: 0;
+    color: #003366;
+    text-align: center;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.problems__grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    margin-top: 24px;
+}
+
+.problem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+}
+
+.problem__icon {
+    width: 128px;
+    height: 128px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.problem__title {
+    margin: 0;
+    color: #2E3033;
+    text-align: center;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.problem__desc {
+    margin: 0;
+    color: #6E6E6E;
+    text-align: center;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px;
+    max-width: 280px;
+}
+
+.problems__cta {
+    display: flex;
+    width: 372px;
+    height: 48px;
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 12px;
+    background: #F98755;
+    color: #FFF;
+    font-family: "Sofia Pro", "Mulish", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    box-sizing: border-box;
+    margin-top: 24px;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (max-width: 960px) {
+    .problems { padding: 60px 20px !important; }
+    .problems__title { font-size: 28px; }
+    .problems__grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+    .problems__grid { grid-template-columns: 1fr; }
+    .problems__cta { width: 100%; max-width: 372px; }
+}
+
 /* ===== STATS ===== */
 .stats {
     background: transparent !important;
