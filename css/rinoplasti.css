@@ -455,7 +455,7 @@ header.site-header {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: rgba(254, 254, 254, 0.88);
+    background: rgba(254, 254, 254, 0.30);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-sizing: border-box;
