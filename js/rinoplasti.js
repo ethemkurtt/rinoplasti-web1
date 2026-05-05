@@ -115,6 +115,91 @@
     }
 })();
 
+// Transformations slider: arrow + mouse drag-to-scroll + per-card play (iframe autoplay)
+(function () {
+    function initTransformations() {
+        const track = document.getElementById('transformationsTrack');
+        if (!track) return;
+        const arrow = document.querySelector('.transformations__arrow');
+
+        // ----- Arrow click → bir sayfa kaydır, sonra başa dön -----
+        if (arrow) {
+            arrow.addEventListener('click', function () {
+                const step = track.clientWidth * 0.7;
+                const max = track.scrollWidth - track.clientWidth;
+                if (track.scrollLeft >= max - 8) {
+                    track.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: step, behavior: 'smooth' });
+                }
+            });
+        }
+
+        // ----- Mouse drag-to-scroll -----
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+        let dragMoved = false;
+        const DRAG_THRESHOLD = 5;
+
+        track.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return;
+            // Play butonuna tıklarsa drag başlatma
+            if (e.target.closest('.transformations__play')) return;
+            isDown = true;
+            dragMoved = false;
+            startX = e.pageX;
+            scrollStart = track.scrollLeft;
+            track.classList.add('is-dragging');
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', function (e) {
+            if (!isDown) return;
+            const dx = e.pageX - startX;
+            if (Math.abs(dx) > DRAG_THRESHOLD) dragMoved = true;
+            track.scrollLeft = scrollStart - dx;
+        });
+
+        window.addEventListener('mouseup', function () {
+            if (!isDown) return;
+            isDown = false;
+            track.classList.remove('is-dragging');
+            // Click handler dragMoved'i okuduktan sonra sıfırla
+            setTimeout(function () { dragMoved = false; }, 0);
+        });
+
+        // ----- Click → play (drag sırasında click ignored) -----
+        track.addEventListener('click', function (e) {
+            if (dragMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            const playBtn = e.target.closest('.transformations__play');
+            if (!playBtn) return;
+            const card = playBtn.closest('.transformations__card');
+            if (!card || card.classList.contains('is-playing')) return;
+            const videoId = card.dataset.video;
+            if (!videoId) return;
+
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+            iframe.title = 'Hasta Hikayesi';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.setAttribute('allowfullscreen', '');
+            card.appendChild(iframe);
+            card.classList.add('is-playing');
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTransformations);
+    } else {
+        initTransformations();
+    }
+})();
+
 // Simulation: play butonuna basılınca poster gizlenir, YouTube iframe autoplay açılır
 (function () {
     function initSimulation() {
