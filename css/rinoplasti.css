@@ -2287,15 +2287,17 @@ header.site-header {
         margin-top: 8px;
     }
 
-    /* Slider web'deki gibi yatay scroll, mobile için thumb biraz küçük + arrow gizli */
+    /* Slider web'deki gibi yatay scroll, mobile thumb küçük + arrow gizli */
     .ek-results__track {
-        gap: 16px;
+        gap: 12px;
     }
 
     .ek-results__thumb {
-        flex: 0 0 280px;
-        width: 280px;
-        height: 280px;
+        flex: 0 0 125.417px;
+        width: 125.417px;
+        height: 125.417px;
+        aspect-ratio: 1 / 1;
+        border-radius: 4.703px;
     }
 
     .ek-results__arrow {
