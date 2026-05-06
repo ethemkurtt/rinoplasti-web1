@@ -1941,11 +1941,6 @@ header.site-header {
     letter-spacing: -0.5px;
 }
 
-@media (max-width: 960px) {
-    .stats { padding: 0 20px 60px !important; }
-    .stats__inner { flex-direction: column; gap: 24px; padding: 32px 16px; }
-    .stat + .stat { border-left: none; border-top: 1px solid #E9E5E1; padding-top: 24px; }
-}
 
 /* ============================================
    MOBILE — max-width: 767px
@@ -2165,6 +2160,44 @@ header.site-header {
     .hero__float-badge--1 { top: 8%; left: 6%; }
     .hero__float-badge--2 { top: 40%; left: 4%; }
     .hero__float-badge--3 { top: 75%; left: 14%; }
+
+    /* ===== STATS (yatay 3 sütun, kompakt) ===== */
+    .stats {
+        padding: 0 20px 40px !important;
+    }
+
+    .stats__inner {
+        flex-direction: row;
+        gap: 0;
+        padding: 20px 12px;
+        align-items: stretch;
+        border-radius: 12px;
+    }
+
+    .stat {
+        flex: 1;
+        gap: 6px;
+        padding: 0 6px;
+        min-width: 0;
+    }
+
+    .stat + .stat {
+        border-left: 1px solid #E9E5E1;
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .stat__num {
+        font-size: 18px;
+        line-height: 24px;
+        letter-spacing: -0.3px;
+    }
+
+    .stat__label {
+        font-size: 11px;
+        line-height: 14px;
+        letter-spacing: -0.2px;
+    }
 }
 
 /* ===== FOOTER ===== */
