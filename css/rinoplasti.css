@@ -2524,7 +2524,9 @@ header.site-header {
 
     /* ===== FOOTER (sıra: left → social → map → copy) ===== */
     .site-footer {
-        padding: 40px 20px 20px !important;
+        padding: 40px 20px 0 !important;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
     }
 
     .site-footer__inner {
@@ -2629,7 +2631,14 @@ header.site-header {
     .site-footer__copy {
         order: 4;
         align-self: flex-start;
-        margin-top: 8px;
+        margin: 8px 0 0 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Inner alt boşluk sıfır */
+    .site-footer__inner {
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
     }
 
     /* Bottom border-top kaldır (display: contents nedeniyle gözükmez ama defansif) */
