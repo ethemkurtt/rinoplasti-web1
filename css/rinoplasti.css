@@ -1666,17 +1666,6 @@ header.site-header {
     transform: scale(1.05);
 }
 
-@media (max-width: 960px) {
-    .reviews { padding: 60px 20px !important; }
-    .reviews__title { font-size: 24px; }
-}
-
-@media (max-width: 600px) {
-    .review { flex-basis: 280px; width: 280px; padding: 20px; }
-    .review__name { font-size: 18px; line-height: 26px; }
-    .review__text { font-size: 14px; line-height: 22px; }
-}
-
 /* ===== FAQ ===== */
 .ek-faq {
     background: #FFFFFF !important;
@@ -2490,6 +2479,46 @@ header.site-header {
     }
 
     .transformations__arrow {
+        display: none;
+    }
+
+    /* ===== REVIEWS (slider, kart spec uygulandı) ===== */
+    .reviews {
+        padding: 0 20px 60px !important;
+    }
+
+    .reviews__inner {
+        gap: 16px;
+        align-items: center;
+    }
+
+    .reviews__title {
+        text-align: center;
+        font-size: 28px;
+        line-height: 36px;
+    }
+
+    .reviews__slider {
+        width: 100%;
+        margin-top: 8px;
+        gap: 0;
+    }
+
+    .reviews__track {
+        gap: 16px;
+    }
+
+    .review {
+        display: flex;
+        flex: 0 0 310px;
+        width: 310px;
+        padding: 16px 32px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .reviews__arrow {
         display: none;
     }
 }
