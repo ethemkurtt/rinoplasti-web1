@@ -2276,9 +2276,7 @@ header.site-header {
 
     .ek-results__slider {
         order: 4;
-        flex-direction: column;
         gap: 0;
-        margin-top: 8px;
     }
 
     .ek-results__cta {
@@ -2289,23 +2287,15 @@ header.site-header {
         margin-top: 8px;
     }
 
-    /* Slider yatay scroll → grid 3 sütun */
+    /* Slider web'deki gibi yatay scroll, mobile için thumb biraz küçük + arrow gizli */
     .ek-results__track {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 8px;
-        overflow: visible;
-        scroll-snap-type: none;
-        scroll-behavior: auto;
+        gap: 16px;
     }
 
     .ek-results__thumb {
-        flex: none;
-        width: 100%;
-        height: auto;
-        aspect-ratio: 1 / 1;
-        border-radius: 4.703px;
-        scroll-snap-align: none;
+        flex: 0 0 280px;
+        width: 280px;
+        height: 280px;
     }
 
     .ek-results__arrow {
