@@ -2192,7 +2192,7 @@ header.site-header {
 
     /* ===== PROBLEMS (2×2 grid, küçük circle icon) ===== */
     .problems {
-        padding: 56px 20px !important;
+        padding: 0 20px 56px !important;
     }
 
     .problems__inner {
