@@ -1240,13 +1240,6 @@ header.site-header {
     .simulation__video { width: 100%; max-width: 625px; height: auto; aspect-ratio: 625 / 446; }
 }
 
-@media (max-width: 600px) {
-    .simulation { padding: 60px 20px !important; }
-    .simulation__title { font-size: 28px; line-height: 36px; }
-    .simulation__desc { font-size: 16px; line-height: 24px; }
-    .simulation__cta { width: 100%; max-width: 372px; }
-}
-
 /* ===== TRANSFORMATIONS ===== */
 .transformations {
     background: #FFFFFF !important;
@@ -2384,6 +2377,67 @@ header.site-header {
         max-width: none;
         height: 56px;
         margin-top: 8px;
+    }
+
+    /* ===== SIMULATION (sıra: badge → title → video → desc → CTA) ===== */
+    .simulation {
+        padding: 0 20px 60px !important;
+    }
+
+    .simulation__inner {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+    }
+
+    .simulation__left {
+        display: contents;
+    }
+
+    .simulation__badge {
+        order: 1;
+        align-self: center;
+    }
+
+    .simulation__title {
+        order: 2;
+        text-align: center;
+        font-size: 28px;
+        line-height: 36px;
+    }
+
+    .simulation__right {
+        order: 3;
+        width: 100%;
+        max-width: none;
+    }
+
+    .simulation__desc {
+        order: 4;
+        text-align: center;
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .simulation__cta {
+        order: 5;
+        width: 100%;
+        max-width: none;
+        height: 56px;
+        margin-top: 0;
+    }
+
+    .simulation__video {
+        width: 100%;
+        max-width: none;
+        height: auto;
+        aspect-ratio: 625 / 446;
+    }
+
+    .simulation__play,
+    .simulation__play svg {
+        width: 56px;
+        height: 56px;
     }
 }
 
