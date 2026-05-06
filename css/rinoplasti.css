@@ -1799,14 +1799,15 @@ header.site-header {
     position: relative;
 }
 
-.ek-faq__icon img {
+.ek-faq__icon-plus,
+.ek-faq__icon-minus {
     width: 100%;
     height: 100%;
-    display: block;
     object-fit: contain;
 }
 
 /* Default: + görünür, - gizli */
+.ek-faq__icon-plus { display: block; }
 .ek-faq__icon-minus { display: none; }
 
 /* Active: + gizli, - görünür */
