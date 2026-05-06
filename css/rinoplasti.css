@@ -1446,16 +1446,6 @@ header.site-header {
     box-shadow: 0 10px 24px rgba(0, 51, 102, 0.25);
 }
 
-@media (max-width: 960px) {
-    .transformations { padding: 60px 20px !important; }
-    .transformations__title { font-size: 28px; line-height: 36px; }
-    .transformations__desc { font-size: 16px; line-height: 24px; }
-}
-
-@media (max-width: 600px) {
-    .transformations__card { flex-basis: 260px; width: 260px; height: 300px; }
-    .transformations__cta { padding: 12px 16px; font-size: 14px; }
-}
 
 /* ===== REVIEWS ===== */
 .reviews {
@@ -2438,6 +2428,69 @@ header.site-header {
     .simulation__play svg {
         width: 56px;
         height: 56px;
+    }
+
+    /* ===== TRANSFORMATIONS (sıra: badge → title → slider → desc → CTA) ===== */
+    .transformations {
+        padding: 0 20px 60px !important;
+    }
+
+    .transformations__inner {
+        gap: 16px;
+    }
+
+    .transformations__badge {
+        order: 1;
+    }
+
+    .transformations__title {
+        order: 2;
+        color: #036;
+        text-align: center;
+        font-family: "Sofia Pro", "Mulish", sans-serif;
+        font-size: 28px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 32px;
+    }
+
+    .transformations__slider {
+        order: 3;
+        margin-top: 8px;
+        gap: 0;
+    }
+
+    .transformations__desc {
+        order: 4;
+        font-size: 15px;
+        line-height: 24px;
+    }
+
+    .transformations__cta {
+        order: 5;
+        width: 100%;
+        padding: 16px 24px;
+        margin-top: 0;
+    }
+
+    .transformations__track {
+        gap: 12px;
+    }
+
+    .transformations__card {
+        display: flex;
+        flex: 0 0 183.089px;
+        width: 183.089px;
+        height: 271.243px;
+        padding: 0 60px 0 59.089px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .transformations__arrow {
+        display: none;
     }
 }
 
