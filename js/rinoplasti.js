@@ -115,20 +115,44 @@
     }
 })();
 
-// FAQ: <details> accordion — tek anda yalnızca 1 soru açık kalır
+// FAQ: button-based accordion (max-height transition + ilk item default açık)
 (function () {
     function initFAQ() {
-        const items = document.querySelectorAll('.faq__item');
+        var items = document.querySelectorAll('.ek-faq__item');
         if (!items.length) return;
 
         items.forEach(function (item) {
-            item.addEventListener('toggle', function () {
-                if (!item.open) return;
-                items.forEach(function (other) {
-                    if (other !== item && other.open) other.open = false;
+            var question = item.querySelector('.ek-faq__question');
+            var answer = item.querySelector('.ek-faq__answer');
+            if (!question || !answer) return;
+
+            question.addEventListener('click', function () {
+                var isOpen = item.classList.contains('active');
+
+                // Tüm item'ları kapat
+                items.forEach(function (i) {
+                    i.classList.remove('active');
+                    var a = i.querySelector('.ek-faq__answer');
+                    if (a) a.style.maxHeight = '0';
                 });
+
+                // Kapalıydıysa aç
+                if (!isOpen) {
+                    item.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
             });
         });
+
+        // İlk item default açık
+        var first = items[0];
+        if (first) {
+            first.classList.add('active');
+            var firstAnswer = first.querySelector('.ek-faq__answer');
+            if (firstAnswer) {
+                firstAnswer.style.maxHeight = firstAnswer.scrollHeight + 'px';
+            }
+        }
     }
 
     if (document.readyState === 'loading') {
