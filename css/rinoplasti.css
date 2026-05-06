@@ -2255,15 +2255,23 @@ header.site-header {
     .ek-results__title {
         order: 2;
         text-align: center;
-        font-size: 30px;
-        line-height: 1.2;
+        color: #036;
+        font-family: "Sofia Pro", "Mulish", sans-serif;
+        font-size: 28px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 48px;
     }
 
     .ek-results__desc {
         order: 3;
         text-align: center;
-        font-size: 15px;
-        line-height: 24px;
+        color: #6E6E6E;
+        font-family: "Sofia Pro", "Mulish", sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 28px;
     }
 
     .ek-results__slider {
@@ -2295,7 +2303,8 @@ header.site-header {
         flex: none;
         width: 100%;
         height: auto;
-        aspect-ratio: 4 / 5;
+        aspect-ratio: 1 / 1;
+        border-radius: 4.703px;
         scroll-snap-align: none;
     }
 
