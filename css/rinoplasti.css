@@ -1094,15 +1094,6 @@ header.site-header {
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-@media (max-width: 960px) {
-    .problems { padding: 60px 20px !important; }
-    .problems__title { font-size: 28px; }
-    .problems__grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 600px) {
-    .problems__grid { grid-template-columns: 1fr; }
-    .problems__cta { width: 100%; max-width: 372px; }
-}
 
 /* ===== SIMULATION ===== */
 .simulation {
@@ -2197,6 +2188,58 @@ header.site-header {
         font-size: 11px;
         line-height: 14px;
         letter-spacing: -0.2px;
+    }
+
+    /* ===== PROBLEMS (2×2 grid, küçük circle icon) ===== */
+    .problems {
+        padding: 56px 20px !important;
+    }
+
+    .problems__inner {
+        gap: 16px;
+    }
+
+    .problems__title {
+        font-size: 26px;
+        line-height: 32px;
+    }
+
+    .problems__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px 16px;
+        margin-top: 16px;
+    }
+
+    .problem {
+        gap: 12px;
+    }
+
+    .problem__icon {
+        width: 60px;
+        height: 60px;
+        box-sizing: border-box;
+        padding: 12px;
+        background: #F1F8FF;
+        border-radius: 50%;
+        object-fit: contain;
+    }
+
+    .problem__title {
+        font-size: 16px;
+        line-height: 22px;
+    }
+
+    .problem__desc {
+        font-size: 13px;
+        line-height: 20px;
+        max-width: none;
+    }
+
+    .problems__cta {
+        width: 100%;
+        max-width: none;
+        height: 56px;
+        margin-top: 16px;
     }
 }
 
