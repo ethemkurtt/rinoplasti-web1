@@ -2522,22 +2522,30 @@ header.site-header {
         display: none;
     }
 
-    /* ===== FOOTER (sıra: logo → intro → contacts → social → map → copy) ===== */
+    /* ===== FOOTER (sıra: left → social → map → copy) ===== */
     .site-footer {
         padding: 40px 20px 20px !important;
     }
 
-    /* inner flex column, alt yapıları contents ile flatten et */
     .site-footer__inner {
         display: flex;
         flex-direction: column;
         gap: 20px;
     }
 
+    /* top ve bottom contents → children inner'ın direct flex item olur */
     .site-footer__top,
-    .site-footer__left,
     .site-footer__bottom {
         display: contents;
+    }
+    /* NOT: left intact (contents değil) — kendi içinde flex column kalır */
+
+    .site-footer__left {
+        order: 1;
+        flex: 0 0 auto;
+        align-items: stretch;
+        gap: 16px;
+        width: 100%;
     }
 
     .site-footer__badge {
@@ -2545,13 +2553,11 @@ header.site-header {
     }
 
     .site-footer__logo {
-        order: 1;
         align-self: flex-start;
         margin-top: 0;
     }
 
     .site-footer__intro {
-        order: 2;
         margin-top: 0;
         gap: 8px;
     }
@@ -2567,7 +2573,6 @@ header.site-header {
 
     /* Contacts: dikey, ortada, aralarında yatay divider */
     .site-footer__contacts {
-        order: 3;
         flex-direction: column;
         align-items: center;
         gap: 0;
@@ -2581,6 +2586,12 @@ header.site-header {
         justify-content: center;
     }
 
+    /* Email link altı çizgili */
+    .site-footer__contact[href^="mailto:"] {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
     .site-footer__contact-sep {
         width: 100%;
         height: 1px;
@@ -2588,9 +2599,9 @@ header.site-header {
         margin: 0;
     }
 
-    /* Social: ortalanmış yatay, divider'lı */
+    /* Social: map'tan ÖNCE, ortalanmış yatay, divider'lı */
     .site-footer__social {
-        order: 4;
+        order: 2;
         align-self: center;
         justify-content: center;
         flex-wrap: wrap;
@@ -2604,9 +2615,9 @@ header.site-header {
         padding-left: 0;
     }
 
-    /* Map: full width */
+    /* Map: social'dan sonra, full width kare */
     .site-footer__map {
-        order: 5;
+        order: 3;
         width: 100%;
         max-width: none;
         height: auto;
@@ -2614,14 +2625,14 @@ header.site-header {
         align-self: stretch;
     }
 
-    /* Copy: alt sol */
+    /* Copy: en altta, sol hizalı */
     .site-footer__copy {
-        order: 6;
+        order: 4;
         align-self: flex-start;
         margin-top: 8px;
     }
 
-    /* Bottom border-top kaldır (artık inner flex column'da) */
+    /* Bottom border-top kaldır (display: contents nedeniyle gözükmez ama defansif) */
     .site-footer__bottom {
         margin-top: 0;
         padding-top: 0;
